@@ -579,6 +579,196 @@ function hmrAccept(bundle /*: ParcelRequire */ , id /*: string */ ) {
 }
 
 },{}],"bNKaB":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+var _user = require("./modules/User");
+var _userDefault = parcelHelpers.interopDefault(_user);
+// Pour récupérer de l'API que le titre, prénom, nom, email, ville, code postal, pays, numéro de téléphone, cellulaire, date de naissance, âge, genre, photo de profil, et nationalité
+// Tableau vide pour stocker les utilisateurs
+const tableauUser = [];
+// Fonction pour récupérer les utilisateurs depuis l'API
+const getUsers = ()=>{
+    //🙋‍♀️ Récupérer des profils utilisateurs depuis une API (6 points)
+    // Appel à l'API pour obtenir 20 utilisateurs aléatoires
+    const users = fetch("https://randomuser.me/api/?results=20").then((resutlat)=>resutlat.json());
+    // Traitemnt des données une fois qu'elles sont récupérers
+    users.then((data)=>{
+        const { results } = data;
+        // pour chaque élément (utilisateur) dans le tableau results provenant de l'API, un nouvel objet User est créé.
+        // Boucle pour récupérer les données souhaitées
+        results.forEach((element)=>{
+            tableauUser.push(new (0, _userDefault.default)(element.name.title, element.name.first, element.name.last, element.email, element.location.city, element.location.postcode, element.location.country, element.phone, element.cell, element.dob.date, element.dob.age));
+        });
+        //  Tri du tableauUser par ordre alphabétique des noms, trie de A-Z
+        tableauUser.sort((a, b)=>{
+            //  compare les noms (nom) de deux utilisateurs (a et b) en utilisant localeCompare pour effectuer un tri sensible à la casse et aux accents.
+            return a.nom.localeCompare(b.nom);
+        });
+        // Affichage de chaque utilisateur dans le document HTML
+        tableauUser.forEach((element)=>{
+            element.render();
+        });
+    });
+};
+// Appel de la fonction pour récupérer les utilisateurs
+getUsers();
+// Gestionnaire d'événements pour le tri des utilisateurs
+document.querySelector(".filters").addEventListener("click", (event)=>{
+    // Vérification si la cible de l'événement n'a pas déjà la classe "selected"
+    if (!event.target.classList.contains("selected")) {
+        // Vérification de l'ID de la cible de l'événement pour déterminer le type de tri
+        if (event.target.id === "sort--name") {
+            // Suppression de la classe "selected" de l'élément actuellement sélectionné
+            document.querySelector(".selected").classList.remove("selected");
+            // Ajout de la classe "selected" à l'élément sur lequel l'utilisateur a cliqué
+            event.target.classList.add("selected");
+            // Tri du tableauUser par ordre alphabétique des noms
+            tableauUser.sort((a, b)=>{
+                return a.nom.localeCompare(b.nom);
+            });
+            // Effacement du contenu principal dans le document HTML
+            document.querySelector("main").innerHTML = "";
+            // Affichage de chaque utilisateur dans le document HTML
+            tableauUser.forEach((element)=>{
+                element.render();
+            });
+        } else if (event.target.id === "sort--age") {
+            // Suppression de la classe "selected" de l'élément actuellement sélectionné
+            document.querySelector(".selected").classList.remove("selected");
+            // Ajout de la classe "selected" à l'élément sur lequel l'utilisateur a cliqué
+            event.target.classList.add("selected");
+            // Tri du tableauUser par ordre croissant des âges
+            tableauUser.sort((a, b)=>{
+                return a.age - b.age;
+            });
+            // Effacement du contenu principal dans le document HTML
+            document.querySelector("main").innerHTML = "";
+            // Affichage de chaque utilisateur dans le document HTML
+            tableauUser.forEach((element)=>{
+                element.render();
+            });
+        }
+    }
+});
+
+},{"./modules/User":"6Uczn","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"6Uczn":[function(require,module,exports) {
+// Créez un module User.js qui exporte une classe User
+//avec les propriétés et les méthodes suivantes. À vous de les nommer et de les implémenter
+//- Une ou plusieurs propriétés contenant les informations d’un utilisateur (nom, âge, email, photo etc…).
+//Une propriété indiquant si l’utilisateur est présent ou non. Celle-ci devrait être `false` par défaut.
+// Une propriété se référant à l’élément utilisateur qui sera généré par la méthode décrite directement **ci-dessous.**
+// propriété privées de la classe
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+class User {
+    #titre;
+    #prenom;
+    nom;
+    #ville;
+    #pays;
+    age;
+    #email;
+    #photo;
+    #present;
+    #element;
+    // Propriété statique pour compter le nombre de personnes présentes
+    static compteurPresence = 0;
+    constructor(titre, prenom, nom, ville, pays, age, email, photo){
+        // Initialisation des propriétés privées et publiques
+        this.#titre = titre;
+        this.#prenom = prenom;
+        this.nom = nom;
+        this.#ville = ville;
+        this.#pays = pays;
+        this.age = age;
+        this.#email = email;
+        this.#photo = photo;
+        this.#present = false;
+        this.#element = this.#generateElement();
+        // Ajout d'un écouteur d'événements pour gérer le clic sur l'élément utilisateur
+        this.#element.addEventListener("click", (event)=>{
+            this.#togglePresence(event.currentTarget);
+        });
+    }
+    // Méthode pour générer un élément utilisateur, 
+    // elle est utilisée pour créer et générer un élément HTML représentant les informations d'un utilisateur. 
+    #generateElement() {
+        // un nouvel élément div est créé
+        const div = document.createElement("div");
+        // ajout de la classe user
+        div.classList.add("user");
+        // ajout de l'attribut data-present
+        div.dataset.present = this.#present;
+        // construction du contenu HTML à l'intéreiur de la div
+        /* Un bloc de texte est créé avec des balises HTML. Il contient une image, des informations de l'utilisateur telles que le nom, l'âge, la ville et le pays, ainsi qu'un lien de messagerie électronique.
+        Les informations de l'utilisateur sont obtenues à partir des propriétés privées (#titre, #prenom, nom, age, #ville, #pays, #email) de l'objet User.  */ const contenu = `
+        <img src="${this.#photo}">
+		<div class="user--info">
+				<h1>${this.#titre} ${this.#prenom} ${this.nom}</h1>
+				<p>${this.age} years old</p>
+				<p>${this.#ville}, ${this.#pays}</p>
+		</div>
+        <a href="mailto:${this.#email}">
+			<span class="mail">\u{2709}\u{FE0F}</span>
+		</a>`;
+        // Le contenu HTML construit est inséré dans l'élément <div> nouvellement créé. L'option "afterbegin" signifie que le contenu sera inséré au début de l'élément.
+        div.insertAdjacentHTML("afterbegin", contenu);
+        return div;
+    }
+    // Méthode d’affichage des éléments utilisateurs
+    render() {
+        document.querySelector("main").appendChild(this.#element);
+    }
+    // Méthode d’inversion de présence
+    #togglePresence(div) {
+        // Vérification de l'état de présence actuel
+        if (this.#present) {
+            // Changement de l'état de présence et mise à jour du compteur
+            // La propriété dataset.present de l'élément <div> est mise à jour pour refléter le nouvel état.
+            div.dataset.present = false;
+            // La propriété privée #present de l'objet User est mise à jour.
+            this.#present = false;
+            User.compteurPresence--;
+        } else {
+            // Changement inverse de l'état de présence et mise à jour du compteur
+            div.dataset.present = true;
+            this.#present = true;
+            User.compteurPresence++;
+        }
+        // Mise à jour du compteur d'utilisateurs présents
+        document.querySelector(".counter").textContent = `${User.compteurPresence}/20 people are here`;
+    }
+}
+exports.default = User;
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gkKU3":[function(require,module,exports) {
+exports.interopDefault = function(a) {
+    return a && a.__esModule ? a : {
+        default: a
+    };
+};
+exports.defineInteropFlag = function(a) {
+    Object.defineProperty(a, "__esModule", {
+        value: true
+    });
+};
+exports.exportAll = function(source, dest) {
+    Object.keys(source).forEach(function(key) {
+        if (key === "default" || key === "__esModule" || Object.prototype.hasOwnProperty.call(dest, key)) return;
+        Object.defineProperty(dest, key, {
+            enumerable: true,
+            get: function() {
+                return source[key];
+            }
+        });
+    });
+    return dest;
+};
+exports.export = function(dest, destName, get) {
+    Object.defineProperty(dest, destName, {
+        enumerable: true,
+        get: get
+    });
+};
 
 },{}]},["3lsJq","bNKaB"], "bNKaB", "parcelRequireac98")
 

@@ -596,7 +596,7 @@ const getUsers = ()=>{
         // pour chaque élément (utilisateur) dans le tableau results provenant de l'API, un nouvel objet User est créé.
         // Boucle pour récupérer les données souhaitées
         results.forEach((element)=>{
-            tableauUser.push(new (0, _userDefault.default)(element.name.title, element.name.first, element.name.last, element.email, element.location.city, element.location.postcode, element.location.country, element.phone, element.cell, element.dob.date, element.dob.age));
+            tableauUser.push(new (0, _userDefault.default)(element.name.title, element.name.first, element.name.last, element.location.city, element.location.country, element.dob.age, element.email, element.picture.large));
         });
         //  Tri du tableauUser par ordre alphabétique des noms, trie de A-Z
         tableauUser.sort((a, b)=>{

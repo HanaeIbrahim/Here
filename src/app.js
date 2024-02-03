@@ -22,14 +22,11 @@ const getUsers = () => {
                     element.name.title,
                     element.name.first,
                     element.name.last,
-                    element.email,
                     element.location.city,
-                    element.location.postcode,
                     element.location.country,
-                    element.phone,
-                    element.cell,
-                    element.dob.date,
                     element.dob.age,
+                    element.email,
+                    element.picture.large
                 )
 
             );
